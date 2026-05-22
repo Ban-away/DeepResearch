@@ -39,7 +39,8 @@ def write_research_brief(state: AgentState) -> Command[Literal["write_draft_repo
     """根据用户的query生成一个研究提纲，内容包含需要调研哪些方面，注意事项等等"""
 
     logger.debug(
-        "write research_brief invoked with %d messages", len(state.get("messages", []))
+        "write research_brief invoked with %d messages",
+        len(state.get("messages", []))
     )
 
     # 组装prompt
