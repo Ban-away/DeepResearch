@@ -12,8 +12,10 @@ from datetime import datetime
 # ===== UTILITY FUNCTIONS =====
 
 def get_today_str() -> str:
-    """获取今天的日期并返回格式化的字符串"""
-    return datetime.now().strftime("%a %b %-d, %Y")
+    """获取今天的日期并返回格式化的字符串（跨平台兼容）"""
+    today = datetime.now()
+    # 使用str.format代替%-d，以兼容Windows系统
+    return f"{today.strftime('%a %b')} {today.day}, {today.year}"
 
 def get_current_dir() -> Path:
     """获取当前的目录"""

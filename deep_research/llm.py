@@ -63,6 +63,7 @@ def _build_openai_kwargs(
 
     kwargs: Dict[str, Any] = {
         "model": model,
+        "model_provider": "openai",
     }
 
     # api_key, base_url
