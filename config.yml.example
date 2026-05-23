@@ -2,9 +2,8 @@ stages:
   prod:
     cognition:
       openai:
-        base_url: http://xxx 
+        base_url: https://api.zhizengzeng.com/v1/ 
         api_key: sk-xxxx
-        organization: dingshixiong
         default_model: gpt-5.4-mini
         temperature: 0
         timeout_seconds: 600
