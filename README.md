@@ -78,7 +78,7 @@ Supervisor Agent 进入迭代循环：
 6. **对抗审查** — Red Team Agent 以批评者视角审查报告的逻辑漏洞和盲区（最多 3 轮）
 7. **自我纠正** — 未解决的批评意见会作为 System Message 注入到下一轮 Supervisor 对话中
 
-当质量达标或达到最大迭代次数时，循环结束。
+当 Supervisor 自主判定研究完成（调用 ResearchComplete）、达到最大迭代次数（15 轮）或无工具调用时，循环结束。
 
 **Stage 4 — 最终报告生成**
 
@@ -124,7 +124,7 @@ pip install -r requirements.txt
 **3. 配置环境变量**
 
 ```bash
-cp env.example .env
+cp .env.example .env
 ```
 
 编辑 `.env`，填入 LangSmith 配置（可选，用于可观测性追踪）：
@@ -225,12 +225,12 @@ roles:
 
 ### 关键参数
 
-| 参数 | 默认值 | 说明 |
-|------|--------|------|
-| `max_researcher_iterations` | 15 | Supervisor 最大迭代次数 |
-| `max_concurrent_researchers` | 3 | 最大并行 Research Agent 数量 |
-| `min_need_repair_score` | 6.0 | 低于此分数触发质量修复提醒 |
-| `MAX_CRITIC` | 3 | Red Team 最大批评轮数 |
+| 参数 | 默认值 | 说明 | 配置位置 |
+|------|--------|------|----------|
+| `max_researcher_iterations` | 15 | Supervisor 最大迭代次数 | `config.yml` 的 `supervisor` 段 |
+| `max_concurrent_researchers` | 3 | 最大并行 Research Agent 数量 | `config.yml` 的 `supervisor` 段 |
+| `min_need_repair_score` | 6.0 | 低于此分数触发质量修复提醒 | `config.yml` 的 `supervisor` 段 |
+| `MAX_CRITIC` | 3 | Red Team 最大批评轮数 | 代码常量（`red_team_agent.py`） |
 
 ---
 
@@ -240,7 +240,7 @@ roles:
 DeepResearch/
 ├── config.yml                          # 全局配置文件
 ├── requirements.txt                    # Python 依赖
-├── env.example                         # 环境变量模板
+├── .env.example                        # 环境变量模板
 ├── run.ipynb                           # 主执行 Notebook
 ├── deep_research/                      # 核心源码
 │   ├── __init__.py
