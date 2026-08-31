@@ -19,6 +19,10 @@ stages:
         topic: general
         include_raw_content: true
         timeout_seconds: 300
+    supervisor:
+      max_researcher_iterations: 15
+      max_concurrent_researchers: 3
+      min_need_repair_score: 6.0
     roles:
       supervisor:
         backend: openai

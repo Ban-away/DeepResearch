@@ -188,6 +188,15 @@ search:
     include_raw_content: true     # 是否包含原始网页内容
 ```
 
+### Supervisor 调度配置
+
+```yaml
+supervisor:
+  max_researcher_iterations: 15   # Supervisor 最大迭代次数
+  max_concurrent_researchers: 3   # 最大并行 Research Agent 数量
+  min_need_repair_score: 6.0      # 低于此分数触发质量修复提醒
+```
+
 ### Agent 角色配置
 
 每个 Agent 可以指定不同的模型：

@@ -12,6 +12,7 @@ Supervisor Agent采用并行执行方式来提高效率，同时为每个研究�
 
 
 import asyncio
+import os
 from typing_extensions import Literal
 from langchain_core.messages import (
     HumanMessage, 
@@ -34,7 +35,7 @@ from deep_research.states import (
     ResearchComplete,
     QualityMetric
 )
-from deep_research.utils import get_today_str
+from deep_research.utils import get_today_str, load_config
 from deep_research.tools import _think_tool, _refine_draft_report_tool
 from deep_research import logging as dr_logging
 
@@ -78,9 +79,35 @@ supervisor_model_with_tools = supervisor_model.bind_tools(supervisor_tools)
 
 
 # System constants (最大迭代次数/最大并行Sub-Agents)
-max_researcher_iterations = 15 # Calls to think_tool + ConductResearch + refine_draft_report
-max_concurrent_researchers = 3 # 最大并行子agent数
-min_need_repair_score = 6.0    # 评估低于这个分数，就要出发agent修复提醒
+# 已下沉到 config.yml 的 supervisor 段落，可配置；未配置时回退到默认值。
+DEFAULT_MAX_RESEARCHER_ITERATIONS = 15  # Calls to think_tool + ConductResearch + refine_draft_report
+DEFAULT_MAX_CONCURRENT_RESEARCHERS = 3  # 最大并行子agent数
+DEFAULT_MIN_NEED_REPAIR_SCORE = 6.0     # 评估低于这个分数，就要出发agent修复提醒
+
+
+def _load_supervisor_params() -> dict:
+    """从 config.yml 的 supervisor 段加载调度参数，未配置或加载失败时回退默认值。"""
+    stage = os.environ.get("STAGE") or "prod"
+    config_path = os.environ.get("CONFIG_PATH", "config.yml")
+
+    try:
+        cfg = load_config(stage_name=stage, config_path=config_path)
+        params = (cfg or {}).get("supervisor") or {}
+    except Exception as exc:
+        logger.warning("Failed to load 'supervisor' config, using defaults: %s", exc)
+        params = {}
+
+    return {
+        "max_researcher_iterations": int(params.get("max_researcher_iterations", DEFAULT_MAX_RESEARCHER_ITERATIONS)),
+        "max_concurrent_researchers": int(params.get("max_concurrent_researchers", DEFAULT_MAX_CONCURRENT_RESEARCHERS)),
+        "min_need_repair_score": float(params.get("min_need_repair_score", DEFAULT_MIN_NEED_REPAIR_SCORE)),
+    }
+
+
+_supervisor_params = _load_supervisor_params()
+max_researcher_iterations = _supervisor_params["max_researcher_iterations"]
+max_concurrent_researchers = _supervisor_params["max_concurrent_researchers"]
+min_need_repair_score = _supervisor_params["min_need_repair_score"]
 
 
 # ===== SUPERVISOR NODES =====
